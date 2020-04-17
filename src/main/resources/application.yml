@@ -1,3 +1,13 @@
 micronaut:
   function:
     name: cancel-subscription
+  server:
+    port: 8085
+    cors:
+      enabled: true
+      configurations:
+        web:
+          allowedOrigins:
+            - http://localhost:4200
+          allowedMethods:
+            - POST

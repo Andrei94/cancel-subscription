@@ -4,14 +4,23 @@ import io.micronaut.core.annotation.*;
 
 @Introspected
 public class CancelSubscription {
-	private String name;
+	private String customerId;
+	private String username;
 
-	public String getName() {
-		return name;
+	public String getCustomerId() {
+		return customerId;
 	}
 
-	public void setName(String name) {
-		this.name = name;
+	public void setCustomerId(String customerId) {
+		this.customerId = customerId;
+	}
+
+	public String getUsername() {
+		return username;
+	}
+
+	public void setUsername(String username) {
+		this.username = username;
 	}
 }
 

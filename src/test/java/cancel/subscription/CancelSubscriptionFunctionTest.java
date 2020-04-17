@@ -15,7 +15,7 @@ public class CancelSubscriptionFunctionTest {
 	@Test
 	public void testFunction() {
 		CancelSubscription body = new CancelSubscription();
-		body.setName("cancel-subscription");
-		assertEquals("cancel-subscription", client.apply(body).blockingGet().getName());
+		body.setCustomerId("cancel-subscription");
+		assertEquals(false, client.apply(body).blockingGet());
 	}
 }

@@ -9,5 +9,5 @@ import javax.inject.Named;
 @FunctionClient
 public interface CancelSubscriptionClient {
 	@Named("cancel-subscription")
-	Single<CancelSubscription> apply(@Body CancelSubscription body);
+	Single<Boolean> apply(@Body CancelSubscription body);
 }
