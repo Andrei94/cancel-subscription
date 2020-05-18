@@ -78,7 +78,7 @@ public class CancelSubscriptionFunction extends FunctionInitializer implements F
 		getIpAddresses().parallelStream().forEach(ip ->
 				{
 					try {
-						httpClient.newCall(new Request.Builder().url("http://" + ip + ":8080" + "/volume/deleteUser/" + user)
+						httpClient.newCall(new Request.Builder().url("https://" + ip + ":8443" + "/volume/deleteUser/" + user)
 								.post(RequestBody.create(MediaType.parse("application/json; charset=utf-8"), "")).build())
 								.execute();
 					} catch(IOException e) {
