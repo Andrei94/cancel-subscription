@@ -22,11 +22,17 @@ import okhttp3.MediaType;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.RequestBody;
+import okhttp3.tls.Certificates;
+import okhttp3.tls.HandshakeCertificates;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.io.IOException;
+import java.net.URISyntaxException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.security.cert.X509Certificate;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
@@ -74,12 +80,15 @@ public class CancelSubscriptionFunction extends FunctionInitializer implements F
 	}
 
 	private void deleteUserFromInstance(String user) {
-		OkHttpClient httpClient = new OkHttpClient();
+		HandshakeCertificates certificates = new HandshakeCertificates.Builder()
+				.addTrustedCertificate(getBackedupCertificateAuthority())
+				.build();
+		OkHttpClient httpClient = new OkHttpClient.Builder().sslSocketFactory(certificates.sslSocketFactory(), certificates.trustManager()).build();
 		getIpAddresses().parallelStream().forEach(ip ->
 				{
 					try {
 						httpClient.newCall(new Request.Builder().url("https://" + ip + ":8443" + "/volume/deleteUser/" + user)
-								.post(RequestBody.create(MediaType.parse("application/json; charset=utf-8"), "")).build())
+								.post(RequestBody.create("", MediaType.parse("application/json; charset=utf-8"))).build())
 								.execute();
 					} catch(IOException e) {
 						logger.error(e.getMessage(), e);
@@ -96,6 +105,15 @@ public class CancelSubscriptionFunction extends FunctionInitializer implements F
 		return backedupInstances.getReservations().stream()
 				.flatMap(reservation -> reservation.getInstances().stream()).collect(Collectors.toList())
 				.stream().map(Instance::getPublicIpAddress).collect(Collectors.toList());
+	}
+
+	private X509Certificate getBackedupCertificateAuthority() {
+		try {
+			return Certificates.decodeCertificatePem(new String(Files.readAllBytes(Paths.get(getClass().getClassLoader().getResource("backedup.pem").toURI()))));
+		} catch(IOException | URISyntaxException e) {
+			e.printStackTrace();
+		}
+		throw new RuntimeException("Failed to load certificate");
 	}
 
 	private void deleteObjectVersions(CancelSubscription msg) {
